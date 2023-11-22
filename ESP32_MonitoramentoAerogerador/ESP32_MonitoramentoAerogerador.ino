@@ -375,7 +375,7 @@ void loop() {                 // Código a ser executado no CORE 1
 
       http.end();  // Finaliza conexão
     } else {
-      Serial.println("WiFi Disconnected");  // Desconecta o wifi
+      Serial.println("WiFi Disconnected"); 
     }
 
     tempo2 = millis();  // Tempo para envio ao servidor e impressão serial
