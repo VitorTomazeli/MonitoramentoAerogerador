@@ -52,13 +52,29 @@ float potencia = 0;
 Adafruit_INA219 ina219;
 
 //_______________________VIBRACAO______________________//
-#define AMOSTRAS	2048                // Deve ser uma potencia de 2 (max = 4096)
-#define FREQ_AMOSTRAGEM 1000          // em Hz
-unsigned int periodo_amostragem_us;   
-double amplitude_pico;
-unsigned int indice_freq_pico;
+#define AMOSTRAS	1024                // Deve ser uma potencia de 2 (max = 4096)
+#define FREQ_AMOSTRAGEM 1024          // em Hz
+unsigned int periodo_amostragem_us;
 double freq_fundamental;
-double freq_pico;
+unsigned int indice_freq_pico1;
+double freq_pico1;
+double amplitude_pico1;
+unsigned int indice_freq_pico2;
+double freq_pico2;
+double amplitude_pico2;
+unsigned int indice_freq_pico3;
+double freq_pico3;
+double amplitude_pico3;
+unsigned int indice_freq_pico4;
+double freq_pico4;
+double amplitude_pico4;
+unsigned int indice_freq_pico5;
+double freq_pico5;
+double amplitude_pico5;
+unsigned int indice_freq_pico6;
+double freq_pico6;
+double amplitude_pico6;
+double freq_vibracao;
 double dados_real[AMOSTRAS];
 double dados_imag[AMOSTRAS];
 unsigned long tempo_corrido;
@@ -207,8 +223,18 @@ void grandezas_ambiente() {               // Rotina para a leitura de pressão, 
 void vibracao() {
   
 //______________________Reseta os valores de pico________________________// 
-amplitude_pico = 0;
-indice_freq_pico = 0;
+amplitude_pico1 = 0;
+indice_freq_pico1 = 0;
+amplitude_pico2 = 0;
+indice_freq_pico2 = 0;
+amplitude_pico3 = 0;
+indice_freq_pico3 = 0;
+amplitude_pico4 = 0;
+indice_freq_pico4 = 0;
+amplitude_pico5 = 0;
+indice_freq_pico5 = 0;
+amplitude_pico6 = 0;
+indice_freq_pico6 = 0;
 
 //____________________Coleta um conjunto de amostras_____________________// 
 for (int i = 0; i < AMOSTRAS; i++){
@@ -227,11 +253,41 @@ FFT.ComplexToMagnitude(); // Converte o numero complexo para amplitude real (des
 //______________________Analisa os dados da FFT__________________________// 
 for(int i = 2; i < (AMOSTRAS/2); i++){
 
-	if(dados_real[i] > amplitude_pico){ 	           // Detecta o indice da frequencia de pico
-		indice_freq_pico = i;
-		amplitude_pico = dados_real[i];
+  if(dados_real[i] > amplitude_pico1){            // Detecta o indice da frequencia de pico
+		indice_freq_pico1 = i;
+		amplitude_pico1 = dados_real[i];
 	}
-	freq_pico = (indice_freq_pico)*freq_fundamental; // Calcula a frequencia de pico
+  else if(dados_real[i] > amplitude_pico2){
+		indice_freq_pico2 = i;
+		amplitude_pico2 = dados_real[i];
+	}
+  else if(dados_real[i] > amplitude_pico3){
+		indice_freq_pico3 = i;
+		amplitude_pico3 = dados_real[i];
+	}
+  else if(dados_real[i] > amplitude_pico4){
+		indice_freq_pico4 = i;
+		amplitude_pico4 = dados_real[i];
+	}
+  else if(dados_real[i] > amplitude_pico5){
+		indice_freq_pico5 = i;
+		amplitude_pico5 = dados_real[i];
+	}
+   else if(dados_real[i] > amplitude_pico6){
+		indice_freq_pico6 = i;
+		amplitude_pico6 = dados_real[i];
+	}
+
+	freq_pico1 = (indice_freq_pico1)*freq_fundamental; //calcula a frequencia de pico 1 
+  freq_pico2 = (indice_freq_pico2)*freq_fundamental; //calcula a frequencia de pico 2
+  freq_pico3 = (indice_freq_pico3)*freq_fundamental; //calcula a frequencia de pico 3
+  freq_pico4 = (indice_freq_pico4)*freq_fundamental; //calcula a frequencia de pico 4
+  freq_pico5 = (indice_freq_pico5)*freq_fundamental; //calcula a frequencia de pico 5
+  freq_pico6 = (indice_freq_pico6)*freq_fundamental; //calcula a frequencia de pico 6
+
+
+  freq_vibracao = sqrt (pow(freq_pico1, 2) + pow(freq_pico2, 2) + pow(freq_pico3, 2) + pow(freq_pico4, 2) + pow(freq_pico5, 2) + pow(freq_pico6, 2));
+  
   vTaskDelay(1);
 }
 }
@@ -276,7 +332,7 @@ void loop() {                 // Código a ser executado no CORE 1
     Serial.print(umidade, 1);     // Imprime valor da umidade na Serial
     Serial.println("%");
 
-    Serial.print("Frequência:   "); Serial.print(freq_pico); Serial.println(" Hz");
+    Serial.print("Frequência Vibração:   "); Serial.print(freq_vibracao); Serial.println(" Hz");
 
     if (WiFi.status() == WL_CONNECTED) {  // Se o wifi estiver conectado
       WiFiClient client;
@@ -291,7 +347,8 @@ void loop() {                 // Código a ser executado no CORE 1
                                + "&umidade=" + umidade
                                + "&temperatura=" + temperatura
                                + "&velocidade_jusante=" + velocidade_jusante
-                               + "&velocidade_montante=" + velocidade_montante;
+                               + "&velocidade_montante=" + velocidade_montante
+                               + "&vibracao=" + freq_vibracao;
 
       int httpResponseCode = http.POST(httpRequestData);  // Tenta salvar os dados no banco de dados
       
