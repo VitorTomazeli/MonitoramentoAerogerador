@@ -85,7 +85,6 @@ const char* ssid = "raspiAP";                                       // Login wif
 const char* password = "raspberry";                                 // Senha wifi
 const char* serverName = "http://10.0.0.220/aerogeradorDataVG.php"; // PHP Bando de Dados
 String apiKeyValue = "tPmAT5Ab3j7F9";                               // Chave Banco de Dados
-String fftApiKeyValue = "sgUn0I3FrI4Nt";                            // Chave Banco de Dados para FFT
 int httpResponseCode;                                               // Verificar variaveis enviadas
 
 //______________________LORATASK______________________//
@@ -285,9 +284,21 @@ for(int i = 2; i < (AMOSTRAS/2); i++){
   freq_pico5 = (indice_freq_pico5)*freq_fundamental; //calcula a frequencia de pico 5
   freq_pico6 = (indice_freq_pico6)*freq_fundamental; //calcula a frequencia de pico 6
 
-
   freq_vibracao = sqrt (pow(freq_pico1, 2) + pow(freq_pico2, 2) + pow(freq_pico3, 2) + pow(freq_pico4, 2) + pow(freq_pico5, 2) + pow(freq_pico6, 2));
   
+  amplitude_pico1 = 0;
+  indice_freq_pico1 = 0;
+  amplitude_pico2 = 0;
+  indice_freq_pico2 = 0;
+  amplitude_pico3 = 0;
+  indice_freq_pico3 = 0;
+  amplitude_pico4 = 0;
+  indice_freq_pico4 = 0;
+  amplitude_pico5 = 0;
+  indice_freq_pico5 = 0;
+  amplitude_pico6 = 0;
+  indice_freq_pico6 = 0;
+
   vTaskDelay(1);
 }
 }
@@ -337,7 +348,7 @@ void loop() {                 // Código a ser executado no CORE 1
     if (WiFi.status() == WL_CONNECTED) {  // Se o wifi estiver conectado
       WiFiClient client;
       HTTPClient http;
-      http.begin(client, serverName);     // Envia as variaveis
+      http.begin(client, serverName);     
       http.addHeader("Content-Type", "application/x-www-form-urlencoded");
       String httpRequestData = "api_key=" + apiKeyValue
                                + "&potencia=" + potencia
